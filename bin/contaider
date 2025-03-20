@@ -1,0 +1,43 @@
+#!/bin/bash
+# -*- mode: shell-script -*-
+set -euo pipefail
+declare -a PODRUN_ARGS
+
+if false; then  # if you don't need any customizations in the Container, you could use this if-branch
+    PODRUN_ARGS+=(--image docker.io/paulgauthier/aider-full)
+    AIDER_ARGS=${@}
+else
+    CONTAIDER_ENV_PATH="$(cd $(dirname $(realpath "$BASH_SOURCE")); git rev-parse --show-toplevel 2>/dev/null)/share/contaider/env"
+    if [ ! -d "$CONTAIDER_ENV_PATH" ]; then
+        CONTAIDER_ENV_PATH=${CONTAIDER_PREFIX:-"$HOME/.local"/share/contaider/env}
+    fi
+    if [ ! -e "$CONTAIDER_ENV_PATH"/Containerfile ]; then
+        >&2 echo "${BASH_SOURCE}:${BASH_LINENO}: Could not find Containerfile in directory: $CONTAIDER_ENV_PATH"
+        exit 1
+    fi
+    PODRUN_ARGS+=(--cont-img-dir "$CONTAIDER_ENV_PATH")
+    PODRUN_ARGS+=(--entrypoint "env")
+    AIDER_ARGS=(/venv/bin/aider)
+fi
+
+# https://aider.chat/docs/llms/other.html#other-api-key-variables
+declare -a potential_env_vars_to_export
+potential_env_vars_to_export=(ALEPHALPHA_API_KEY ALEPH_ALPHA_API_KEY ANTHROPIC_API_KEY ANYSCALE_API_KEY AZURE_AI_API_KEY AZURE_API_KEY AZURE_OPENAI_API_KEY BASETEN_API_KEY CEREBRAS_API_KEY CLARIFAI_API_KEY CLOUDFLARE_API_KEY CODESTRAL_API_KEY COHERE_API_KEY CO_API_KEY DATABRICKS_API_KEY DEEPINFRA_API_KEY DEEPSEEK_API_KEY FIREWORKSAI_API_KEY FIREWORKS_AI_API_KEY FIREWORKS_API_KEY GEMINI_API_KEY GROQ_API_KEY HUGGINGFACE_API_KEY MARITALK_API_KEY MISTRAL_API_KEY NLP_CLOUD_API_KEY NVIDIA_NIM_API_KEY OLLAMA_API_KEY OPENAI_API_KEY OPENAI_LIKE_API_KEY OPENROUTER_API_KEY OR_API_KEY PALM_API_KEY PERPLEXITYAI_API_KEY PREDIBASE_API_KEY PROVIDER_API_KEY REPLICATE_API_KEY TOGETHERAI_API_KEY VOLCENGINE_API_KEY VOYAGE_API_KEY WATSONX_API_KEY WX_API_KEY XAI_API_KEY XINFERENCE_API_KEY)
+# https://github.com/Aider-AI/aider/issues/949#issuecomment-2621274231
+# https://docs.litellm.ai/docs/providers/litellm_proxy#required-variables
+potential_env_vars_to_export+=(LITELLM_PROXY_API_KEY LITELLM_PROXY_API_BASE)
+
+for env_var_name in "${potential_env_vars_to_export[@]}"; do
+    if [[ -v "$env_var_name" ]]; then
+        PODRUN_ARGS+=(-e $env_var_name)
+    fi
+done
+
+set -x
+podrun \
+    "${PODRUN_ARGS[@]}" \
+    --user $(id -u):$(id -g) \
+    --userns keep-id \
+    -e LOGNAME \
+    -- \
+    "${AIDER_ARGS[@]}"

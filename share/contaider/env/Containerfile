@@ -1,0 +1,3 @@
+FROM docker.io/paulgauthier/aider-full
+
+RUN /venv/bin/python -m pip install uv  # add your preferred customizations here
