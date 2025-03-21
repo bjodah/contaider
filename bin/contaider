@@ -44,6 +44,7 @@ podrun \
     "${PODRUN_ARGS[@]}" \
     --user $(id -u):$(id -g) \
     --userns keep-id \
+    --network=host \
     -e LOGNAME \
     -- \
     "${AIDER_ARGS[@]}"
