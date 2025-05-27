@@ -55,6 +55,8 @@ podrun \
     --user $(id -u):$(id -g) \
     --userns keep-id \
     -e LOGNAME \
+    -e GIT_AUTHOR_EMAIL="$(git config get user.email)" \
+    -e GIT_USER_NAME="$(git config get user.name) (aider)" \
     -- \
     "${AIDER_ARGS[@]}"
 

@@ -5,7 +5,9 @@ USER root
 RUN apt-get update --quiet && apt-get install --quiet --assume-yes curl jq
 USER appuser
 RUN bash -c ". /venv/bin/activate; pip install uv; hash -r; \
-uv pip install pytest ruff codespell yamllint nox flake8 sphinx myst-parser isort coverage mypy pyright[nodejs] pyupgrade"
+    uv pip install \
+    alembic pytest ruff codespell yamllint nox flake8 sphinx myst-parser isort coverage mypy pyright[nodejs] pyupgrade \
+    fastapi httpx sqlalchemy databases uvicorn aiosqlite"
 
 # shellcheck is susceptible to OOM, below is a pathced version, you probably want to compile your own binary though (supply-chain risk):
 # https://github.com/koalaman/shellcheck/compare/master...bjodah:shellcheck:extended-analysis-default-False
