@@ -9,7 +9,8 @@ $ cd my-brainstorming-idea
 $ git init .
 $ export OPENROUTER_API_KEY="sk-or-v1-deadbeef0badcafe"
 $ contaider --architect --model openrouter/deepseek/deepseek-r1 \
-    --editor-model openrouter/deepseek/deepseek-chat-v3-0324
+    --editor-model openrouter/deepseek/deepseek-chat-v3-0324 \
+    --weak-model openrouter/google/gemini-2.0-flash-lite-001
 ```
 
 ## Customization
