@@ -15,7 +15,7 @@ $ contaider --architect --model openrouter/deepseek/deepseek-r1 \
 
 ## Customization
 You can install dependencies that you rely on by modifying
-[Containerfile](share/contaider/env/Containerfile)
+[Containerfile](share/contaider/env-contaider/Containerfile)
 
 ## Local models
 You can use e.g [llama-swap](https://github.com/mostlygeek/llama-swap) and pass e.g.
